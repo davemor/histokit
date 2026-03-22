@@ -1,0 +1,26 @@
+[project]
+name = "histokit"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [{ name = "David Morrison", email = "dm236@st-andrews.ac.uk" }]
+requires-python = ">=3.14"
+dependencies = [
+    "matplotlib>=3.10.8",
+    "opencv-python>=4.13.0.92",
+    "openslide-bin>=4.0.0.13",
+    "openslide-python>=1.4.3",
+    "pandas>=3.0.1",
+    "pillow>=12.1.1",
+    "typer>=0.24.1",
+]
+
+[project.scripts]
+histokit = "histokit.cli.main:main"
+
+[build-system]
+requires = ["uv_build>=0.9.24,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = ["ruff>=0.15.6"]
