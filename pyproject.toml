@@ -12,6 +12,7 @@ dependencies = [
     "openslide-python>=1.4.3",
     "pandas>=3.0.1",
     "pillow>=12.1.1",
+    "scipy>=1.17.1",
     "typer>=0.24.1",
 ]
 
