@@ -4,10 +4,8 @@ from typing import Tuple
 import cv2
 import numpy as np
 
-from histokit.data.slides.slide import Region
-from histokit.utils.convert import pil_to_np
 
-from histokit.utils.filters import compute_padding, pool2d
+from histokit.utils.filters import pool2d
 
 """
 OpenCV functions that use used in the transforms:

@@ -1,5 +1,4 @@
 from abc import ABCMeta, abstractmethod
-import copy
 from pathlib import Path
 from typing import List, NamedTuple
 
@@ -27,7 +26,8 @@ class Region(NamedTuple):
 
 
 class SlideBase(metaclass=ABCMeta):
-    def __init__(self):
+    def __init__(self, path: Path) -> None:
+        self.slide_path = path
         self.is_open = False
 
     @abstractmethod
@@ -50,9 +50,8 @@ class SlideBase(metaclass=ABCMeta):
         self.is_open = False
 
     @property
-    @abstractmethod
     def path(self) -> Path:
-        raise NotImplementedError
+        return self.slide_path
 
     @property
     @abstractmethod

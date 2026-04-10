@@ -11,11 +11,16 @@ from histokit.data.schema import DatasetSchema
 
 class Dataset:
     def __init__(
-        self, index: pd.DataFrame, schema: DatasetSchema, data_root: Path
+        self, index: pd.DataFrame, schema: DatasetSchema, data_root: Path, 
+        annotations_root: Path = Path(),
+        slide_root: Path = Path()
     ) -> None:
         self.index = index
         self.schema = schema
         self.data_root = data_root
+        self.annotations_root = annotations_root
+        self.slide_root = slide_root
+
 
     @property
     def slide_kind(self) -> str:

@@ -6,10 +6,12 @@ from histokit.data.annotations.registry import register_annotation
 from histokit.data.schema import AnnotationSchema
 from histokit.utils.geometry import PointF
 
-from .annotation import Annotation
+from .annotation import AnnotationRegion
 
 
-def annotation_from_tag(tag: ET.Element, group_labels: Dict[str, int]) -> Annotation:
+def annotation_from_tag(
+    tag: ET.Element, group_labels: Dict[str, int]
+) -> AnnotationRegion:
     """Parse a single ASAP XML annotation tag."""
 
     name = tag.attrib["Name"]
@@ -25,13 +27,13 @@ def annotation_from_tag(tag: ET.Element, group_labels: Dict[str, int]) -> Annota
     ]
 
     # Keep the semantic label name, do not map it to its integer id here.
-    return Annotation(name, annotation_type, group, vertices)
+    return AnnotationRegion(name, annotation_type, group, vertices)
 
 
 @register_annotation("asap-xml")
 def load_annotations_asapxml(
     xml_file_path: Path, schema: AnnotationSchema
-) -> List[Annotation]:
+) -> List[AnnotationRegion]:
     """Load ASAP XML annotations as a list of Annotation objects."""
 
     if not xml_file_path.is_file():

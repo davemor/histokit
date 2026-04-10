@@ -3,10 +3,27 @@
 # TissueTransforms go from arrays (thumbnails) to arrays
 # TissueDetectors go from slides to arrays
 
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 
-from .transforms import *
-from histokit.data.slides import SlideBase
+import numpy as np
+from tqdm import tqdm
+
+from histokit.utils.convert import pil_to_np
+
+from .transforms import (
+    CannyEdgeTheshold,
+    MaxPoolDownSample,
+    MedianBlur,
+    MorphologicalClosing,
+    OTSU_H_S_Mask,
+    PureBlackToPureWhite,
+    RgbToHsv,
+    ThresholdOTSU,
+    TissueTransform,
+    TissueTransforms,
+    ToMask,
+)
+from histokit.data.slides import SlideBase, Region
 
 
 class TissueDetector(metaclass=ABCMeta):
@@ -14,17 +31,17 @@ class TissueDetector(metaclass=ABCMeta):
         self.name = name
 
     @abstractmethod
-    def __call__(self, slide: SlideBase) -> np.array:
+    def __call__(self, slide: SlideBase) -> np.ndarray:
         pass
 
 
 class ThumbTissueDetector(TissueDetector):
-    def __init__(self, name, features_level: int, transforms: TissueTransforms):
+    def __init__(self, name: str, features_level: int, transforms: TissueTransforms) -> None:
         super().__init__(name)
         self.features_level = features_level
         self.transforms = transforms
 
-    def __call__(self, slide: SlideBase) -> np.array:
+    def __call__(self, slide: SlideBase) -> np.ndarray:
         thumb = slide.get_thumbnail(self.features_level)
         tissue_mask = self.transforms(thumb)
         return tissue_mask
@@ -33,31 +50,25 @@ class ThumbTissueDetector(TissueDetector):
 class PatchesTissueDetector(TissueDetector):
     def __init__(
         self,
-        name,
+        name: str,
         transform: TissueTransform,
         patch_level: int = 1,
-        features_level: int = 6,
-        labels_level: int = 9,
+        patch_size: int = 224,
     ) -> None:
         super().__init__(name)
         self.transform = transform
         self.patch_level = patch_level
-        self.features_level = features_level
-        self.labels_level = labels_level
-        self.patch_size = 2 ** (labels_level - patch_level)
+        self.patch_size = patch_size
 
-    def __call__(self, slide: SlideBase) -> np.array:
-        # render the annotations at features level
-        slide_w, slide_h = slide.dimensions[self.features_level]
+    def __call__(self, slide: SlideBase) -> np.ndarray:
+        # get the size of the wsi at the level that we want to sample at
+        width_pixels, height_pixels = slide.dimensions[self.patch_level]
 
-        # compute the size as if we had max pooled the annotations down to labels level
-        kernel_size = 2 ** (self.labels_level - self.features_level)
-        height, width = (
-            (slide_h - kernel_size) // kernel_size + 1,
-            (slide_w - kernel_size) // kernel_size + 1,
-        )
+        # compute the width and height in patches
+        width_patches = width_pixels // self.patch_size + self.patch_size
+        height_patches = height_pixels // self.patch_size + self.patch_size
 
-        # work out the regions
+        # compute the regions
         indices, regions = zip(
             *[
                 (
@@ -69,17 +80,17 @@ class PatchesTissueDetector(TissueDetector):
                         self.patch_level,
                     ),
                 )
-                for ix in range(0, width)
-                for iy in range(0, height)
+                for ix in range(0, width_patches)
+                for iy in range(0, height_patches)
             ]
         )
 
         # read in all the regions and apply the transforms
         transformed_patches = [
-            self.transform(pil_to_np(p)) for p in slide.read_regions(regions)
+            self.transform(pil_to_np(p)) for p in tqdm(slide.read_regions(regions))
         ]
 
-        arr = np.full((height, width), -1)
+        arr = np.full((height_patches, width_patches), -1)
         for (col, row), patch in zip(indices, transformed_patches):
             arr[col, row] = patch
 
@@ -89,7 +100,7 @@ class PatchesTissueDetector(TissueDetector):
 # Define some tissue detectors
 
 
-def clam_segmentation(features_level, labels_level, sthresh=20, mthresh=7, close=0):
+def clam_segmentation(features_level: int, labels_level: int, sthresh: int = 20, mthresh: int = 7, close: int = 0) -> ThumbTissueDetector:
     return ThumbTissueDetector(
         "clam_segmentation",
         features_level,
@@ -105,7 +116,7 @@ def clam_segmentation(features_level, labels_level, sthresh=20, mthresh=7, close
     )
 
 
-def clam_segmentation_otsu(features_level, labels_level, close=0):
+def clam_segmentation_otsu(features_level: int, labels_level: int, close: int = 0) -> ThumbTissueDetector:
     return ThumbTissueDetector(
         "clam_segmentation_otsu",
         features_level,
@@ -121,7 +132,7 @@ def clam_segmentation_otsu(features_level, labels_level, close=0):
     )
 
 
-def otsu_hs_segmentation(features_level, labels_level):
+def otsu_hs_segmentation(features_level: int, labels_level: int) -> ThumbTissueDetector:
     return ThumbTissueDetector(
         "otsu_hs_segmentation",
         features_level,
@@ -135,11 +146,10 @@ def otsu_hs_segmentation(features_level, labels_level):
     )
 
 
-def per_patch_canny_segmentation(patch_level=1, features_level=6, labels_level=9):
+def per_patch_canny_segmentation(patch_level: int = 1, patch_size: int = 224) -> PatchesTissueDetector:
     return PatchesTissueDetector(
         "per_patch_canny_segmentation",
         CannyEdgeTheshold(),
         patch_level=patch_level,
-        features_level=features_level,
-        labels_level=labels_level,
+        patch_size=patch_size,
     )
