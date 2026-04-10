@@ -67,3 +67,8 @@ class AnnotationSet:
     @property
     def bounds(self) -> tuple[float, float, float, float]:
         return self.bounding_box().bounds
+
+    def render_to_grid(self, cell_size: int, mag_level: int) -> np.ndarray:
+        factor = cell_size * (2 ** mag_level)
+        shape = (int(self.bounds[3] / factor) + 1, int(self.bounds[2] / factor) + 1)
+        return self.render(Shape(*shape), factor)
