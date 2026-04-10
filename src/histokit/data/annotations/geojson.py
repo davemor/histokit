@@ -74,7 +74,7 @@ def annotation_from_feature(
     raise ValueError(f"Unknown geometry type encountered: {geometry_type}")
 
 
-@register_annotation("geojson")
+@register_annotation("geojson", extensions=[".geojson"])
 def load_annotations_geojson(
     json_path: Path,
     schema: AnnotationSchema,

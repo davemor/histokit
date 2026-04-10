@@ -30,7 +30,7 @@ def annotation_from_tag(
     return AnnotationRegion(name, annotation_type, group, vertices)
 
 
-@register_annotation("asap-xml")
+@register_annotation("asap-xml", extensions=[".xml"])
 def load_annotations_asapxml(
     xml_file_path: Path, schema: AnnotationSchema
 ) -> List[AnnotationRegion]:
