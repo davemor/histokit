@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from pathlib import Path
-from typing import List, NamedTuple
+from typing import NamedTuple
 
 import numpy as np
 from PIL import Image
@@ -13,16 +13,16 @@ class Region(NamedTuple):
     size: Size
 
     @classmethod
-    def patch(cls, x, y, size, level):
+    def patch(cls, x: int, y: int, size: int, level: int) -> "Region":
         location = Point(x, y)
-        size = Size(size, size)
-        return Region(level, location, size)
+        region_size = Size(size, size)
+        return Region(level, location, region_size)
 
     @classmethod
-    def make(cls, x, y, width, height, level):
+    def make(cls, x: int, y: int, width: int, height: int, level: int) -> "Region":
         location = Point(x, y)
-        size = Size(width, height)
-        return Region(level, location, size)
+        region_size = Size(width, height)
+        return Region(level, location, region_size)
 
 
 class SlideBase(metaclass=ABCMeta):
@@ -44,7 +44,7 @@ class SlideBase(metaclass=ABCMeta):
         self.is_open = True
         return self
 
-    def __exit__(self, *args):
+    def __exit__(self, *args: object) -> None:
         assert self.is_open, "Cannot close slide that is not open."
         self.close()
         self.is_open = False
@@ -55,11 +55,11 @@ class SlideBase(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def dimensions(self) -> List[Size]:
+    def dimensions(self) -> list[Size]:
         raise NotImplementedError
 
     @abstractmethod
-    def level_downsamples(self) -> List[float]:
+    def level_downsamples(self) -> list[float]:
         raise NotImplementedError
 
     @abstractmethod
@@ -67,7 +67,7 @@ class SlideBase(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def read_regions(self, regions: List[Region]) -> Image.Image:
+    def read_regions(self, regions: list[Region]) -> list[Image.Image]:
         raise NotImplementedError
     
 

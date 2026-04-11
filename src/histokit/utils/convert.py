@@ -1,15 +1,15 @@
-from typing import Dict
+from typing import Any, Dict
 import numpy as np
 from PIL import Image
 
 import pandas as pd
 
 
-def invert(d: Dict) -> Dict:
+def invert(d: Dict[Any, Any]) -> Dict[Any, Any]:
     return {v: k for k, v in d.items()}
 
 
-def pil_to_np(image: Image) -> np.ndarray:
+def pil_to_np(image: Image.Image) -> np.ndarray:
     """Convert a PIL image into a Numpy array
 
     Args:
@@ -23,7 +23,7 @@ def pil_to_np(image: Image) -> np.ndarray:
     return arr
 
 
-def np_to_pil(arr: np.ndarray) -> Image:
+def np_to_pil(arr: np.ndarray) -> Image.Image:
     """Convert a Numpy array into a PIL image
 
     Args:

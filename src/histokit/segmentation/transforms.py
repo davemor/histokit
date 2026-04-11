@@ -4,7 +4,8 @@ import cv2
 import numpy as np
 
 
-from histokit.utils.filters import pool2d
+from histokit.utils.filters import PoolMode, pool2d
+
 
 """
 OpenCV functions that use used in the transforms:
@@ -117,6 +118,14 @@ class ThresholdFixed(TissueTransform):
             img, self.sthresh, self.sthresh_up, cv2.THRESH_BINARY
         )
         return img_thresh
+    
+
+class GreaterThan(TissueTransform):
+    def __init__(self, threshold: float = 0.5) -> None:
+        self.threshold = threshold
+
+    def __call__(self, img: np.ndarray) -> np.ndarray:
+        return img >= self.threshold
 
 
 class ToMask(TissueTransform):
@@ -124,34 +133,31 @@ class ToMask(TissueTransform):
         return img.astype(np.bool)
 
 
-class CannyEdgeTheshold(TissueTransform):
-    def __init__(self, theshold: float = 2.0) -> None:
-        self.theshold = theshold
+class CannyEdgeDetector(TissueTransform):
+    """Computes edge fraction of a patch using Canny edge detection.
+
+    Returns the fraction of pixels that are edges (0.0 to 1.0).
+    """
 
     def __call__(self, img: np.ndarray) -> np.ndarray:
         img_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-        canny_edges = cv2.Canny(img_gray, 40, 100)  # note - hardcoded?
-        max_edge = np.max(canny_edges)
+        canny_edges = cv2.Canny(img_gray, 40, 100)
 
-        # early out
-        if max_edge == 0 or img.size == 0:
-            return np.array(False)
+        num_pixels = img_gray.shape[0] * img_gray.shape[1]
+        if num_pixels == 0:
+            return np.array(0.0)
 
-        edges = (np.sum(canny_edges / max_edge) / img.size) * 100
-        return np.array(edges >= self.theshold)
+        edge_fraction = np.count_nonzero(canny_edges) / num_pixels
+        return np.array(edge_fraction)
 
 
 class MaxPoolDownSample(TissueTransform):
-    def __init__(self, features_level: int = 6, labels_level: int = 9) -> None:
-        self.is_identity = labels_level == features_level
-        kernel_size = 2 ** (labels_level - features_level)
+    def __init__(self, kernel_size: int = 2, stride: int = 2, padding: int = 0, pool_mode: PoolMode = PoolMode.MAX) -> None:
         self.kernel_size = kernel_size
-        self.stride = kernel_size
+        self.stride = stride
+        self.padding = padding
+        self.pool_mode = pool_mode
 
     def __call__(self, img: np.ndarray) -> np.ndarray:
-        # slide_h, slide_w = img.shape
-        # height, width = (slide_h - self.kernel_size) // self.kernel_size + 1, (slide_w - self.kernel_size) // self.kernel_size + 1
-        if self.is_identity:
-            return img
-        out = pool2d(img, self.kernel_size, self.stride, pool_mode="max")
+        out = pool2d(img, self.kernel_size, self.stride, pool_mode=self.pool_mode)
         return out

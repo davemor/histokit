@@ -1,6 +1,7 @@
+from enum import Enum
+
 import numpy as np
 from numpy.lib.stride_tricks import as_strided
-from scipy import stats
 
 
 def compute_padding(input_size: tuple[int, int], kernel_size: int, stride: int) -> tuple[int, int]:
@@ -32,7 +33,12 @@ def compute_padding(input_size: tuple[int, int], kernel_size: int, stride: int) 
     return pad_h, pad_w
 
 
-def pool2d(A: np.ndarray, kernel_size: int, stride: int, padding: int = 0, pool_mode: str = "max") -> np.ndarray:
+class PoolMode(Enum):
+    MAX = "max"
+    AVG = "avg"
+    MIN = "min"
+
+def pool2d(A: np.ndarray, kernel_size: int, stride: int, padding: int = 0, pool_mode: PoolMode = PoolMode.MAX) -> np.ndarray:
     """
     2D Pooling
 
@@ -43,7 +49,7 @@ def pool2d(A: np.ndarray, kernel_size: int, stride: int, padding: int = 0, pool_
         kernel_size: int, the size of the window
         stride: int, the stride of the window
         padding: int, implicit zero paddings on both sides of the input
-        pool_mode: string, 'max' or 'avg' or 'mode'
+        pool_mode: PoolMode, 'max' or 'avg' or 'min'
     """
     # Padding
     A_padded = np.pad(A, padding, mode="constant")
@@ -63,13 +69,11 @@ def pool2d(A: np.ndarray, kernel_size: int, stride: int, padding: int = 0, pool_
     A_w = A_w.reshape(-1, *kernel_size_tuple)
 
     # Return the result of pooling
-    if pool_mode == "max":
+    if pool_mode == PoolMode.MAX:
         return A_w.max(axis=(1, 2)).reshape(output_shape)
-    elif pool_mode == "avg":
+    elif pool_mode == PoolMode.AVG:
         return A_w.mean(axis=(1, 2)).reshape(output_shape)
-    elif pool_mode == "mode":
-        A_w_reshape = np.reshape(A_w, (A_w.shape[0], -1))
-        mode: np.ndarray = stats.mode(A_w_reshape, axis=1, keepdims=True).mode
-        return mode.reshape(output_shape)
+    elif pool_mode == PoolMode.MIN:
+        return A_w.min(axis=(1, 2)).reshape(output_shape)
     else:
         raise ValueError(f"Unknown pool_mode: {pool_mode}")
