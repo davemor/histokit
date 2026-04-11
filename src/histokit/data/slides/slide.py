@@ -69,6 +69,8 @@ class SlideBase(metaclass=ABCMeta):
     @abstractmethod
     def read_regions(self, regions: List[Region]) -> Image.Image:
         raise NotImplementedError
+    
+
 
     def get_thumbnail(self, level: int, white_background: bool = True) -> np.ndarray:
         """Generate a thumbnail of the slide at a given pyramid level.
@@ -132,3 +134,42 @@ class SlideBase(metaclass=ABCMeta):
             new_im[black_pixels] = [255, 255, 255]
 
         return new_im
+
+    def get_thumbnail_for_size(
+        self, width: int, height: int, white_background: bool = True
+    ) -> np.ndarray:
+        """Generate a thumbnail resized to the given pixel dimensions.
+
+        Selects the deepest pyramid level whose native dimensions are still at
+        least ``width`` x ``height`` (to avoid reading more data than necessary
+        while preventing upscaling where possible). If every level is smaller
+        than the requested size, the deepest (smallest) level is used as the
+        source. The result is then resized to exactly ``(width, height)``.
+
+        Args:
+            width: Target width in pixels.
+            height: Target height in pixels.
+            white_background: If True, replace pure black pixels with white.
+
+        Returns:
+            Thumbnail image as an RGB numpy array of shape (height, width, 3).
+        """
+        if width <= 0 or height <= 0:
+            raise ValueError(
+                f"width and height must be positive, got width={width}, height={height}"
+            )
+
+        # Find the deepest level whose dimensions still cover the requested size.
+        # Levels are ordered from largest (0) to smallest (max_level), so we scan
+        # from the end and take the first level that satisfies both constraints.
+        best_level = len(self.dimensions) - 1  # fallback: deepest level
+        for level_idx in range(len(self.dimensions) - 1, -1, -1):
+            dim = self.dimensions[level_idx]
+            if dim.width >= width and dim.height >= height:
+                best_level = level_idx
+                break
+
+        im_array = self.get_thumbnail(best_level, white_background=white_background)
+        im = Image.fromarray(im_array)
+        im = im.resize((width, height), resample=Image.Resampling.BILINEAR)
+        return np.asarray(im)

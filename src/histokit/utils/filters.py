@@ -3,7 +3,7 @@ from numpy.lib.stride_tricks import as_strided
 from scipy import stats
 
 
-def compute_padding(input_size, kernel_size, stride):
+def compute_padding(input_size: tuple[int, int], kernel_size: int, stride: int) -> tuple[int, int]:
     """
     Compute the required padding for a 2D array to ensure complete pooling coverage.
 
@@ -32,7 +32,7 @@ def compute_padding(input_size, kernel_size, stride):
     return pad_h, pad_w
 
 
-def pool2d(A, kernel_size, stride, padding=0, pool_mode="max"):
+def pool2d(A: np.ndarray, kernel_size: int, stride: int, padding: int = 0, pool_mode: str = "max") -> np.ndarray:
     """
     2D Pooling
 
@@ -43,24 +43,24 @@ def pool2d(A, kernel_size, stride, padding=0, pool_mode="max"):
         kernel_size: int, the size of the window
         stride: int, the stride of the window
         padding: int, implicit zero paddings on both sides of the input
-        pool_mode: string, 'max' or 'avg'
+        pool_mode: string, 'max' or 'avg' or 'mode'
     """
     # Padding
-    A = np.pad(A, padding, mode="constant")
+    A_padded = np.pad(A, padding, mode="constant")
 
     # Window view of A
     output_shape = (
-        (A.shape[0] - kernel_size) // stride + 1,
-        (A.shape[1] - kernel_size) // stride + 1,
+        (A_padded.shape[0] - kernel_size) // stride + 1,
+        (A_padded.shape[1] - kernel_size) // stride + 1,
     )
-    kernel_size = (kernel_size, kernel_size)
+    kernel_size_tuple = (kernel_size, kernel_size)
     A_w = as_strided(
-        A,
-        shape=output_shape + kernel_size,
-        strides=(stride * A.strides[0], stride * A.strides[1]) + A.strides,
+        A_padded,
+        shape=output_shape + kernel_size_tuple,
+        strides=(stride * A_padded.strides[0], stride * A_padded.strides[1]) + A_padded.strides,
     )
 
-    A_w = A_w.reshape(-1, *kernel_size)
+    A_w = A_w.reshape(-1, *kernel_size_tuple)
 
     # Return the result of pooling
     if pool_mode == "max":
@@ -69,4 +69,7 @@ def pool2d(A, kernel_size, stride, padding=0, pool_mode="max"):
         return A_w.mean(axis=(1, 2)).reshape(output_shape)
     elif pool_mode == "mode":
         A_w_reshape = np.reshape(A_w, (A_w.shape[0], -1))
-        return stats.mode(A_w_reshape, axis=1)[0].reshape(output_shape)
+        mode: np.ndarray = stats.mode(A_w_reshape, axis=1, keepdims=True).mode
+        return mode.reshape(output_shape)
+    else:
+        raise ValueError(f"Unknown pool_mode: {pool_mode}")
