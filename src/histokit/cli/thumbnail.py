@@ -6,13 +6,13 @@ import numpy as np
 import typer
 from PIL import Image
 
-from histokit.data.slides.registry import get_slide_cls_for_path
-from histokit.data.annotations.registry import get_annotation_loader_for_path
-from histokit.data.annotations.annotation import AnnotationSet
-from histokit.data.schema import DatasetSchema
+from histokit.io.slides.registry import get_slide_cls_for_path
+from histokit.io.annotations.registry import get_annotation_loader_for_path
+from histokit.io.annotations.annotation import AnnotationSet
+from histokit.dataset.schema import DatasetSchema
 from histokit.utils.geometry import Shape
-import histokit.data.slides  # noqa: F401 — triggers slide backend registration
-import histokit.data.annotations  # noqa: F401 — triggers annotation loader registration
+import histokit.io.slides  # noqa: F401 — triggers slide backend registration
+import histokit.io.annotations  # noqa: F401 — triggers annotation loader registration
 
 
 def overlay_annotations(
