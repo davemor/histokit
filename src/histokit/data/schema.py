@@ -6,13 +6,13 @@ from pathlib import Path
 from typing import Any
 
 
-@dataclass
+@dataclass(frozen=True)
 class SlideSchema:
     kind: str
     label_schema: dict[str, int]
 
 
-@dataclass
+@dataclass(frozen=True)
 class AnnotationSchema:
     kind: str
     label_map: dict[str, int]
@@ -21,7 +21,7 @@ class AnnotationSchema:
     label_order: list[str]
 
 
-@dataclass
+@dataclass(frozen=True)
 class DatasetSchema:
     slides: SlideSchema
     annotations: AnnotationSchema
