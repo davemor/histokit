@@ -73,6 +73,9 @@ class AnnotationSet:
     @property
     def bounds(self) -> tuple[float, float, float, float]:
         return self.bounding_box().bounds
+    
+    def get_fill_index(self) -> int:
+        return self.label_map[self.fill_label]
 
     def render_as_grid(self, patch_size: int, patch_level: int) -> np.ndarray:
         factor = patch_size * (2 ** patch_level)

@@ -70,7 +70,7 @@ class Dataset:
         index_csv_path = Path(index_csv_path)
         schema_path = Path(schema_path)
 
-        index = pd.read_csv(index_csv_path)
+        index = pd.read_csv(index_csv_path, index_col=0)
 
         # append the slide_dir to the slide paths in the index if provided
         if slides_dir is not None:
