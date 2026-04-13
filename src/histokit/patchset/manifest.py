@@ -1,10 +1,7 @@
 from dataclasses import dataclass
-from typing import Any
 
 
 @dataclass(frozen=True)
 class PatchSetManifest:
-    pipeline_name: str
-    dataset_name: str
-    sample_count: int
+    # TODO: note that the setting for the pipeline should also be here
     created_at: str

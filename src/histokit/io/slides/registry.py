@@ -24,6 +24,14 @@ def get_slide_cls(name: str) -> type["SlideBase"]:
     return registry[name]
 
 
+def is_slide_format_supported(name: str) -> bool:
+    return name in registry
+
+def is_slide_extension_supported(ext: str) -> bool:
+    key = ext if ext.startswith(".") else f".{ext}"
+    return key in ext_registry
+
+
 def get_slide_cls_for_path(path: Path) -> type["SlideBase"]:
     suffixes = path.suffixes
     # Try the full compound suffix first (e.g. ".ome.tiff"), then each trailing suffix

@@ -173,3 +173,14 @@ class SlideBase(metaclass=ABCMeta):
         im = Image.fromarray(im_array)
         im = im.resize((width, height), resample=Image.Resampling.BILINEAR)
         return np.asarray(im)
+
+
+    def size_in_patches(self, patch_size: int, patch_level: int) -> Size:
+        # work out the size of the thumbnail we need to read in
+        dims = self.dimensions[patch_level]
+        
+        # compute the number of patches in each dimension
+        width_patches = (dims[0] + patch_size - 1) // patch_size
+        height_patches = (dims[1] + patch_size - 1) // patch_size
+        
+        return Size(width_patches, height_patches)

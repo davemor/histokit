@@ -43,7 +43,8 @@ class Dataset:
             if col not in {"slide", "annotation"}
         }
 
-        sample_id = metadata.get("id", Path(row["slide"]).stem)
+        # the id is just the file name without any extensions
+        sample_id = metadata.get("id", Path(row["slide"]).name.split(".", 1)[0])
 
         return Sample(
             id=str(sample_id),
@@ -60,12 +61,26 @@ class Dataset:
 
     @classmethod
     def from_index(
-        cls, index_csv_path: Path | str, schema_path: Path | str
+        cls, 
+        index_csv_path: Path | str, 
+        schema_path: Path | str,
+        slides_dir: Path | str | None = None, 
+        annotations_dir: Path | str | None = None,
     ) -> "Dataset":
         index_csv_path = Path(index_csv_path)
         schema_path = Path(schema_path)
 
         index = pd.read_csv(index_csv_path)
+
+        # append the slide_dir to the slide paths in the index if provided
+        if slides_dir is not None:
+            slides_dir = Path(slides_dir)
+            index["slide"] = index["slide"].apply(lambda x: str(slides_dir / x))
+
+        # append the annotations_dir to the annotation paths in the index if provided
+        if annotations_dir is not None:
+            annotations_dir = Path(annotations_dir)
+            index["annotation"] = index["annotation"].apply(lambda x: str(annotations_dir / x) if pd.notna(x) else x)
 
         with open(schema_path, "r") as file:
             schema_dict = json.load(file)

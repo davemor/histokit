@@ -13,3 +13,6 @@ class PatchSet:
         self.frame = frame
         self.contexts = contexts
         self.manifest = manifest
+
+    def __repr__(self) -> str:
+        return f"PatchSet(num_patches={len(self.frame)}, contexts={self.contexts}, manifest={self.manifest})"

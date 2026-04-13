@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from histokit.dataset.schema import AnnotationSchema, SlideSchema
+from histokit.io.slides.registry import get_slide_cls, get_slide_cls_for_path, is_slide_extension_supported, is_slide_format_supported
+
 
 if TYPE_CHECKING:
     from histokit.io.annotations.annotation import AnnotationSet
@@ -21,9 +23,12 @@ class Sample:
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def make_slide(self):
-        from histokit.io.slides.registry import get_slide_cls
-
-        slide_cls = get_slide_cls(self.slide_schema.kind)
+        if is_slide_format_supported(self.slide_schema.kind):
+            slide_cls = get_slide_cls(self.slide_schema.kind)
+        elif is_slide_extension_supported(self.slide_path.suffix):
+            slide_cls = get_slide_cls_for_path(self.slide_path)
+        else:
+            raise ValueError(f"No slide backend registered for format '{self.slide_schema.kind}' or extension '{self.slide_path.suffix}'")
         return slide_cls(self.slide_path)
 
     @contextmanager

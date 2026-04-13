@@ -9,4 +9,6 @@ app.command(name="thumbnail")(thumbnail)
 
 
 def main() -> None:
+    print("Welcome to Histokit CLI!")
+    print("Use --help to see available commands.")
     app()

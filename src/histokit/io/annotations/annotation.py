@@ -46,6 +46,12 @@ class AnnotationSet:
         self.labels_order: List[str] = schema.label_order
         self.fill_label: str = schema.fill_label
 
+    def __repr__(self) -> str:
+        return f"AnnotationSet(num_annotations={len(self.annotations)}, labels={list(self.label_map.keys())})"
+
+    def __len__(self) -> int:
+        return len(self.annotations)
+
     def render(self, shape: Shape, factor: float) -> np.ndarray:
         assert len(shape) == 2, "Annotations must be rendered onto a 2D array."
         annotations = sorted(
@@ -68,7 +74,11 @@ class AnnotationSet:
     def bounds(self) -> tuple[float, float, float, float]:
         return self.bounding_box().bounds
 
-    def render_to_grid(self, patch_size: int, patch_level: int) -> np.ndarray:
+    def render_as_grid(self, patch_size: int, patch_level: int) -> np.ndarray:
         factor = patch_size * (2 ** patch_level)
         shape = (int(self.bounds[3] / factor) + 1, int(self.bounds[2] / factor) + 1)
         return self.render(Shape(*shape), factor)
+
+    def render_to_grid(self, shape: Shape, patch_size: int, patch_level: int) -> np.ndarray:
+        factor = patch_size * (2 ** patch_level)
+        return self.render(shape, factor)

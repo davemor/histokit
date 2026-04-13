@@ -55,8 +55,6 @@ def annotation_from_feature(
 
     classification = properties["classification"]
 
-    print(classification)
-
     label = standardise_label(classification["name"])
 
     if label not in labels:
