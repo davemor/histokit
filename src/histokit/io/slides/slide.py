@@ -55,6 +55,12 @@ class SlideBase(metaclass=ABCMeta):
 
     @property
     @abstractmethod
+    def mpp(self) -> float | None:
+        """Microns per pixel at level 0, or ``None`` if unavailable."""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
     def dimensions(self) -> list[Size]:
         raise NotImplementedError
 

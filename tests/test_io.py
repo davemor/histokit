@@ -159,6 +159,33 @@ class TestAnnotationLoading:
 
 # ── AnnotationRegion geometry ────────────────────────────────────────────────
 
+# ── Slide MPP ───────────────────────────────────────────────────────────
+
+@needs_cervical_mini
+class TestSlideMPP:
+    def test_tiffslide_mpp_returns_float(self, cervical_mini_samples):
+        sample = cervical_mini_samples[0]
+        with sample.open_slide() as slide:
+            mpp = slide.mpp
+            assert mpp is not None
+            assert isinstance(mpp, float)
+            # Reasonable range for histopathology slides
+            assert 0.1 < mpp < 10.0
+
+    def test_tiffslide_mpp_consistent_across_samples(
+        self, cervical_mini_samples
+    ):
+        mpps = []
+        for sample in cervical_mini_samples:
+            with sample.open_slide() as slide:
+                mpp = slide.mpp
+                if mpp is not None:
+                    mpps.append(mpp)
+        assert len(mpps) > 0
+
+
+# ── AnnotationRegion geometry ────────────────────────────────────────────
+
 class TestAnnotationRegionGeometry:
     def test_polygon_geometry(self):
         vertices = [(0.0, 0.0), (100.0, 0.0), (100.0, 100.0), (0.0, 100.0)]

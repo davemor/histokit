@@ -21,6 +21,18 @@ class TiffSlideSlide(SlideBase):
         self.tsr.close()
 
     @property
+    def mpp(self) -> float | None:
+        props = self.tsr.properties
+        for prefix in ("tiffslide", "openslide"):
+            try:
+                x = float(props[f"{prefix}.mpp-x"])
+                y = float(props[f"{prefix}.mpp-y"])
+                return (x + y) / 2.0
+            except (KeyError, ValueError, TypeError):
+                continue
+        return None
+
+    @property
     def dimensions(self) -> List[Size]:
         return [Size(*dim) for dim in self.tsr.level_dimensions]
 
