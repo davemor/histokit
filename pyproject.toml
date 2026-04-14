@@ -1,7 +1,7 @@
 [project]
 name = "histokit"
 version = "0.0.1"
-description = ""
+description = "A histopathology toolkit for working with whole slide images and their annotations."
 readme = "README.md"
 authors = [{ name = "David Morrison", email = "dm236@st-andrews.ac.uk" }]
 requires-python = ">=3.14"
@@ -21,6 +21,27 @@ dependencies = [
 ]
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
+keywords = [
+    "histopathology",
+    "whole-slide-image",
+    "digital-pathology",
+    "patches",
+    "preprocessing",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Image Processing",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+
+[project.urls]
+Homepage = "https://github.com/davemor/histokit"
+Repository = "https://github.com/davemor/histokit"
+Issues = "https://github.com/davemor/histokit/issues"
 
 [project.scripts]
 histokit = "histokit.cli.main:main"

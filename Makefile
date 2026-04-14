@@ -1,4 +1,4 @@
-.PHONY: fmt tests
+.PHONY: fmt tests build publish
 
 fmt:
 	uv run ruff check --fix
@@ -9,6 +9,3 @@ tests:
 
 build:
 	uv build
-
-publish:
-	uv publish
