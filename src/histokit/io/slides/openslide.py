@@ -21,6 +21,15 @@ class OpenSlideSlide(SlideBase):
         self.osr.close()
 
     @property
+    def mpp(self) -> float | None:
+        try:
+            x = float(self.osr.properties["openslide.mpp-x"])
+            y = float(self.osr.properties["openslide.mpp-y"])
+            return (x + y) / 2.0
+        except (KeyError, ValueError):
+            return None
+
+    @property
     def dimensions(self) -> List[Size]:
         return [Size(*dim) for dim in self.osr.level_dimensions]
 
