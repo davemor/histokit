@@ -6,3 +6,9 @@ fmt:
 
 tests:
 	uv run pytest tests/
+
+build:
+	uv build
+
+publish:
+	uv publish

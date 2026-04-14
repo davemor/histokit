@@ -1,7 +1,7 @@
 [project]
 name = "histokit"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.0.1"
+description = ""
 readme = "README.md"
 authors = [{ name = "David Morrison", email = "dm236@st-andrews.ac.uk" }]
 requires-python = ">=3.14"
@@ -19,6 +19,8 @@ dependencies = [
     "tqdm>=4.67.3",
     "typer>=0.24.1",
 ]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
 
 [project.scripts]
 histokit = "histokit.cli.main:main"
@@ -28,10 +30,7 @@ requires = ["uv_build>=0.9.24,<0.10.0"]
 build-backend = "uv_build"
 
 [dependency-groups]
-dev = [
-    "pytest>=9.0.3",
-    "ruff>=0.15.6",
-]
+dev = ["pytest>=9.0.3", "ruff>=0.15.6"]
 
 [tool.ruff]
 line-length = 80
