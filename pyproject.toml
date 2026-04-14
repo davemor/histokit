@@ -46,6 +46,9 @@ Issues = "https://github.com/davemor/histokit/issues"
 [project.scripts]
 histokit = "histokit.cli.main:main"
 
+[project.optional-dependencies]
+grandqc = ["torch>=2.0", "segmentation-models-pytorch>=0.3"]
+
 [build-system]
 requires = ["uv_build>=0.9.24,<0.10.0"]
 build-backend = "uv_build"
