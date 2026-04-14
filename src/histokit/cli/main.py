@@ -1,14 +1,18 @@
 import typer
 
-from .example import example
-from .thumbnail import thumbnail
+from .export import export_cmd
+from .list import list_pipelines
+from .plan import plan
+from .preview import preview
+from .run import run
 
-app = typer.Typer()
-app.command(name="example")(example)
-app.command(name="thumbnail")(thumbnail)
+app = typer.Typer(help="histokit — histopathology toolkit CLI.")
+app.command(name="list")(list_pipelines)
+app.command(name="plan")(plan)
+app.command(name="run")(run)
+app.command(name="preview")(preview)
+app.command(name="export")(export_cmd)
 
 
 def main() -> None:
-    print("Welcome to Histokit CLI!")
-    print("Use --help to see available commands.")
     app()
