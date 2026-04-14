@@ -7,10 +7,120 @@ Histokit is a histopathology whole slide image preprocessing package for Python 
 Histokit can be installed as a command line tool directly from this repository using uv. Here is an example:
 
 ```bash
+uv tool update-shell
 uv tool install git+https://github.com/davemor/histokit
 ```
 
-# How to use the CLI interface
+# CLI Interface
+
+```bash
+❯ histokit --help
+
+ Usage: histokit [OPTIONS] COMMAND [ARGS]...
+
+ histokit — histopathology toolkit CLI.
+
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --install-completion          Install completion for the current shell.      │
+│ --show-completion             Show completion for the current shell, to copy │
+│                               it or customize the installation.              │
+│ --help                        Show this message and exit.                    │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Commands ───────────────────────────────────────────────────────────────────╮
+│ list     List available built-in pipelines.                                  │
+│ plan     Show pipeline stages and resolved parameters.                       │
+│ run      Run a pipeline on a dataset and save the resulting PatchSet.        │
+│ preview  Preview a pipeline on a single sample with diagnostic images.       │
+│ export   Export patch images from a saved PatchSet to label-name             │
+│          directories.                                                        │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+```
+
+## `histokit list`
+
+Show all built-in pipelines that ship with histokit. Each entry shows the import reference and stage count.
+
+```bash
+histokit list
+```
+
+```
+Available pipelines:
+
+  histokit.pipelines.presets.basic:pipeline  (4 stages)
+  histokit.pipelines.presets.research:pipeline  (4 stages)
+```
+
+## `histokit plan`
+
+Inspect a pipeline's stages and see what parameters they use. Use `--set` to preview overrides without running anything.
+
+```bash
+# Show default parameters
+histokit plan histokit.pipelines.presets.basic:pipeline
+
+# Preview with overrides
+histokit plan histokit.pipelines.presets.basic:pipeline --set patch_size=512 --set level=0
+```
+
+## `histokit run`
+
+Run a pipeline on a full dataset and save the combined PatchSet to disk.
+
+```bash
+# Basic run
+histokit run histokit.pipelines.presets.basic:pipeline \
+  --index data/icaird/cervical_mini/index.csv \
+  --labels data/icaird/cervical_mini/labels.json \
+  --output runs/cervical_basic
+
+# With parameter overrides
+histokit run histokit.pipelines.presets.basic:pipeline \
+  --index data/icaird/cervical_mini/index.csv \
+  --labels data/icaird/cervical_mini/labels.json \
+  --output runs/cervical_512 \
+  --set patch_size=512
+
+# Overwrite a previous run
+histokit run histokit.pipelines.presets.basic:pipeline \
+  --index data/icaird/cervical_mini/index.csv \
+  --labels data/icaird/cervical_mini/labels.json \
+  --output runs/cervical_basic \
+  --overwrite
+```
+
+## `histokit preview`
+
+Run a pipeline on a single sample and save diagnostic images (thumbnail, patch overlay) to an output directory. Useful for checking pipeline settings before a full run.
+
+```bash
+# Preview the first sample in the dataset
+histokit preview histokit.pipelines.presets.basic:pipeline \
+  --index data/icaird/cervical_mini/index.csv \
+  --labels data/icaird/cervical_mini/labels.json \
+  --output preview/cervical
+
+# Preview a specific sample
+histokit preview histokit.pipelines.presets.basic:pipeline \
+  --index data/icaird/cervical_mini/index.csv \
+  --labels data/icaird/cervical_mini/labels.json \
+  --output preview/cervical \
+  --sample IC-CX-00001-01
+```
+
+## `histokit export`
+
+Export patch images from a saved PatchSet to label-name subdirectories, compatible with `torchvision.datasets.ImageFolder`.
+
+```bash
+histokit export runs/cervical_basic \
+  --index data/icaird/cervical_mini/index.csv \
+  --labels data/icaird/cervical_mini/labels.json \
+  --output patches/cervical_basic
+```
+
+The output directory will contain one folder per label with individual patch PNG files and a `provenance.json` recording how the export was produced.
 
 # Pipeline Stages
 
