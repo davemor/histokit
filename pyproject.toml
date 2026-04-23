@@ -54,7 +54,11 @@ requires = ["uv_build>=0.9.24,<0.10.0"]
 build-backend = "uv_build"
 
 [dependency-groups]
-dev = ["pytest>=9.0.3", "ruff>=0.15.6"]
+dev = [
+    "pylint>=4.0.5",
+    "pytest>=9.0.3",
+    "ruff>=0.15.6",
+]
 
 [tool.ruff]
 line-length = 80

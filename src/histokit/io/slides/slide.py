@@ -190,3 +190,27 @@ class SlideBase(metaclass=ABCMeta):
         height_patches = (dims[1] + patch_size - 1) // patch_size
         
         return Size(width_patches, height_patches)
+    
+    def get_thumbnail_for_patch_size(
+        self, patch_size: int, patch_level: int, white_background: bool = True
+    ) -> np.ndarray:
+        """Generate a thumbnail resized to the given patch size and level.
+
+        This is a convenience method that combines the logic of `size_in_patches`
+        and `get_thumbnail_for_size` to directly obtain a thumbnail of the appropriate
+        dimensions for a given patch size and level.
+
+        Args:
+            patch_size: Size of the square patches in pixels.
+            patch_level: Pyramid level at which the patch size is defined.
+            white_background: If True, replace pure black pixels with white.
+
+        Returns:
+            Thumbnail image as an RGB numpy array of shape (height_in_patches, width_in_patches, 3).
+        """
+        size_in_patches = self.size_in_patches(patch_size, patch_level)
+        return self.get_thumbnail_for_size(
+            width=size_in_patches.width,
+            height=size_in_patches.height,
+            white_background=white_background,
+        )

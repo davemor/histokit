@@ -55,8 +55,19 @@ def run(
 
     results = pipe.run(dataset, **params)
 
+    print(f"Pipeline completed. Got {len(results)} patchsets.")
+
+    # Save per-sample patchsets
+    output.mkdir(parents=True, exist_ok=True)
+    for patchset in results:
+        print('Processing patchset for sample:', patchset.contexts[0].sample.id if patchset.contexts else 'unknown')
+        sample_id = patchset.contexts[0].sample.id if patchset.contexts else "unknown"
+        patchset_dir = output / f"{sample_id}.patchset"
+        patchset.save(patchset_dir)
+
+    # Combine and save the full patchset as before
     patchset = combine_patchsets(results)
-    patchset.save(output)
+    patchset.save(output / "full.patchset")
 
     n_kept = int(patchset.frame["keep"].sum()) if "keep" in patchset.frame.columns else len(patchset.frame)
     typer.echo(f"\nDone. {len(patchset.frame)} patches ({n_kept} kept), saved to {output}")

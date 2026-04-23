@@ -1,30 +1,30 @@
-# Registry for TissueDetector factory functions
+# Registry for Detector factory functions
 from collections.abc import Callable
 
-from histokit.segmentation.detector import TissueDetector
+from histokit.segmentation.detector import Detector
 
 
-TissueDetectorFactory = Callable[..., "TissueDetector"]
+DetectorFactory = Callable[..., "Detector"]
 
-tissue_detector_registry: dict[str, TissueDetectorFactory] = {}
+detector_registry: dict[str, DetectorFactory] = {}
 
-def register_tissue_detector(name: str) -> Callable[[TissueDetectorFactory], TissueDetectorFactory]:
-    """Decorator to register a function that returns a TissueDetector subclass.
+def register_detector(name: str) -> Callable[[DetectorFactory], DetectorFactory]:
+    """Decorator to register a function that returns a Detector subclass.
 
     The returned detector's ``name`` property is automatically set to *name*.
     """
-    def decorator(func: TissueDetectorFactory) -> TissueDetectorFactory:
-        def wrapper(*args: object, **kwargs: object) -> TissueDetector:
+    def decorator(func: DetectorFactory) -> DetectorFactory:
+        def wrapper(*args: object, **kwargs: object) -> Detector:
             detector = func(*args, **kwargs)
             detector.name = name
             return detector
-        tissue_detector_registry[name] = wrapper
+        detector_registry[name] = wrapper
         return wrapper
     return decorator
 
 
-def get_tissue_detector(name: str) -> TissueDetectorFactory:
-    """Get a registered TissueDetector factory function by name."""
-    if name not in tissue_detector_registry:
-        raise ValueError(f"TissueDetector '{name}' not found in registry. Available: {list(tissue_detector_registry.keys())}")
-    return tissue_detector_registry[name]
+def get_detector(name: str) -> DetectorFactory:
+    """Get a registered Detector factory function by name."""
+    if name not in detector_registry:
+        raise ValueError(f"Detector '{name}' not found in registry. Available: {list(detector_registry.keys())}")
+    return detector_registry[name]

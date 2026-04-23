@@ -32,20 +32,20 @@ needs_torch = pytest.mark.skipif(
 class TestRegistryWithoutGrandQC:
     def test_core_detectors_always_registered(self):
         from histokit.segmentation.registry import (
-            tissue_detector_registry,
+            detector_registry,
         )
 
-        assert "per_patch_canny_ranker" in tissue_detector_registry
+        assert "per_patch_canny_ranker" in detector_registry
 
     def test_grandqc_absent_gives_clear_error(self):
         from histokit.segmentation.registry import (
-            get_tissue_detector,
-            tissue_detector_registry,
+            get_detector,
+            detector_registry,
         )
 
-        if "grandqc_tissue" not in tissue_detector_registry:
+        if "grandqc_tissue" not in detector_registry:
             with pytest.raises(ValueError, match="not found"):
-                get_tissue_detector("grandqc_tissue")
+                get_detector("grandqc_tissue")
 
 
 # ── Tests requiring torch (skip otherwise) ──────────────────────────────
@@ -55,10 +55,10 @@ class TestRegistryWithoutGrandQC:
 class TestGrandQCRegistered:
     def test_grandqc_tissue_in_registry(self):
         from histokit.segmentation.registry import (
-            tissue_detector_registry,
+            detector_registry,
         )
 
-        assert "grandqc_tissue" in tissue_detector_registry
+        assert "grandqc_tissue" in detector_registry
 
 
 @needs_torch
@@ -150,7 +150,7 @@ class TestGrandQCDetectorWithMockModel:
 
     def test_output_shape_matches_grid(self, monkeypatch):
         from histokit.segmentation.grandqc import (
-            GrandQCTissueDetector,
+            GrandQCDetector,
         )
 
         def fake_load(model_path, device):
@@ -172,7 +172,7 @@ class TestGrandQCDetectorWithMockModel:
         )
 
         slide = self._make_mock_slide()
-        detector = GrandQCTissueDetector(
+        detector = GrandQCDetector(
             patch_size=256,
             patch_level=2,
             model_path=Path("/fake/path"),
@@ -185,7 +185,7 @@ class TestGrandQCDetectorWithMockModel:
 
     def test_tissue_probability_range(self, monkeypatch):
         from histokit.segmentation.grandqc import (
-            GrandQCTissueDetector,
+            GrandQCDetector,
         )
 
         def fake_load(model_path, device):
@@ -204,7 +204,7 @@ class TestGrandQCDetectorWithMockModel:
         )
 
         slide = self._make_mock_slide()
-        detector = GrandQCTissueDetector(
+        detector = GrandQCDetector(
             patch_size=256,
             patch_level=2,
             model_path=Path("/fake/path"),
@@ -216,13 +216,13 @@ class TestGrandQCDetectorWithMockModel:
 
     def test_raises_without_mpp(self, monkeypatch):
         from histokit.segmentation.grandqc import (
-            GrandQCTissueDetector,
+            GrandQCDetector,
         )
 
         slide = self._make_mock_slide()
         slide.mpp = None
 
-        detector = GrandQCTissueDetector(
+        detector = GrandQCDetector(
             patch_size=256,
             patch_level=2,
             model_path=Path("/fake/path"),
@@ -254,11 +254,11 @@ class TestGrandQCIntegration:
         self, cervical_mini_samples
     ):
         from histokit.segmentation.grandqc import (
-            GrandQCTissueDetector,
+            GrandQCDetector,
         )
 
         sample = cervical_mini_samples[0]
-        detector = GrandQCTissueDetector(
+        detector = GrandQCDetector(
             patch_size=256,
             patch_level=1,
             model_path=MODEL_PATH,

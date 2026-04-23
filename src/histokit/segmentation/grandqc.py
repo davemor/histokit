@@ -20,8 +20,8 @@ import numpy as np
 from PIL import Image
 
 from histokit.io.slides.slide import SlideBase
-from histokit.segmentation.detector import TissueDetector
-from histokit.segmentation.registry import register_tissue_detector
+from histokit.segmentation.detector import Detector
+from histokit.segmentation.registry import register_detector
 
 import torch
 import segmentation_models_pytorch as smp
@@ -107,7 +107,7 @@ def _preprocess_tile(tile: np.ndarray) -> np.ndarray:
 # ── detector ────────────────────────────────────────────────────────────
 
 
-class GrandQCTissueDetector(TissueDetector):
+class GrandQCDetector(Detector):
     """Tissue detector using the GrandQC UNet++ model.
 
     Produces a 2-D array of tissue probabilities (0.0 = background,
@@ -208,13 +208,13 @@ class GrandQCTissueDetector(TissueDetector):
 # ── registration ────────────────────────────────────────────────────────
 
 
-@register_tissue_detector("grandqc_tissue")
+@register_detector("grandqc_tissue")
 def grandqc_tissue(
     patch_size: int,
     patch_level: int,
     **_kwargs: object,
-) -> GrandQCTissueDetector:
-    return GrandQCTissueDetector(
+) -> GrandQCDetector:
+    return GrandQCDetector(
         patch_size=patch_size,
         patch_level=patch_level,
     )

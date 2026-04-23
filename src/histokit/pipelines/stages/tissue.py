@@ -6,7 +6,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from histokit.segmentation.registry import get_tissue_detector
+from histokit.segmentation.registry import get_detector
 from histokit.utils.convert import to_frame_with_locations
 from ..model import PatchCandidates
 from ..params import resolve_value
@@ -30,7 +30,7 @@ class TissueMask(Stage):
         candidates.require_columns("row", "column", "context_idx")
 
         context = candidates.contexts[0]
-        factory = get_tissue_detector(self.method)
+        factory = get_detector(self.method)
         detector = factory(
             patch_size=context.patch_size,
             patch_level=context.level,

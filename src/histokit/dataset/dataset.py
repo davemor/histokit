@@ -59,6 +59,15 @@ class Dataset:
         for _, row in self.index.iterrows():
             yield self.sample_from_row(row)
 
+    def get_sample_by_id(self, sample_id: str) -> Sample | None:
+        # find the row in the index with the given sample_id
+        row = self.index[self.index["id"] == sample_id]
+        if len(row) == 0:
+            return None
+        elif len(row) > 1:
+            raise ValueError(f"Multiple samples found with id {sample_id}")
+        return self.sample_from_row(row.iloc[0])
+
     @classmethod
     def from_index(
         cls, 

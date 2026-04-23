@@ -70,23 +70,23 @@ Run a pipeline on a full dataset and save the combined PatchSet to disk.
 
 ```bash
 # Basic run
-histokit run histokit.pipelines.presets.basic:pipeline \
-  --index data/icaird/cervical_mini/index.csv \
-  --labels data/icaird/cervical_mini/labels.json \
-  --output runs/cervical_basic
+histokit run histokit.pipelines.presets.research:pipeline \
+  --index data/icaird_cervical_mini/index.csv \
+  --labels data/icaird_cervical_mini/labels.json \
+  --output output/icaird_cervical_mini/patchsets \
 
 # With parameter overrides
 histokit run histokit.pipelines.presets.basic:pipeline \
-  --index data/icaird/cervical_mini/index.csv \
-  --labels data/icaird/cervical_mini/labels.json \
-  --output runs/cervical_512 \
+  --index data/icaird_cervical_mini/index.csv \
+  --labels data/icaird_cervical_mini/labels.json \
+  --output output/icaird_cervical_mini/patchsets \
   --set patch_size=512
 
 # Overwrite a previous run
-histokit run histokit.pipelines.presets.basic:pipeline \
-  --index data/icaird/cervical_mini/index.csv \
-  --labels data/icaird/cervical_mini/labels.json \
-  --output runs/cervical_basic \
+histokit run histokit.pipelines.presets.research:pipeline \
+  --index data/icaird_cervical_mini/index.csv \
+  --labels data/icaird_cervical_mini/labels.json \
+  --output output/icaird_cervical_mini/patchsets \
   --overwrite
 ```
 
@@ -117,7 +117,8 @@ Export patch images from a saved PatchSet to label-name subdirectories, compatib
 histokit export runs/cervical_basic \
   --index data/icaird/cervical_mini/index.csv \
   --labels data/icaird/cervical_mini/labels.json \
-  --output patches/cervical_basic
+  --output output/icaird/cervical_mini/patches
+
 ```
 
 The output directory will contain one folder per label with individual patch PNG files and a `provenance.json` recording how the export was produced.

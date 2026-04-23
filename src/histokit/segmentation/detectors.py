@@ -1,6 +1,6 @@
-from histokit.segmentation.detector import PatchesTissueDetector, ThumbTissueDetector
+from histokit.segmentation.detector import PatchesDetector, ThumbDetector
 
-from .registry import register_tissue_detector
+from .registry import register_detector
 from .transforms import (
     CannyEdgeDetector,
     GreaterThan,
@@ -16,9 +16,9 @@ from .transforms import (
 )
 
 
-@register_tissue_detector("clam_segmentation")
-def clam_segmentation(patch_size: int, patch_level: int, features_level: int, sthresh: int = 20, mthresh: int = 7, close: int = 0) -> ThumbTissueDetector:
-    detector = ThumbTissueDetector(
+@register_detector("clam_segmentation")
+def clam_segmentation(patch_size: int, patch_level: int, features_level: int, sthresh: int = 20, mthresh: int = 7, close: int = 0) -> ThumbDetector:
+    detector = ThumbDetector(
         patch_size,
         patch_level,
         features_level,
@@ -34,9 +34,9 @@ def clam_segmentation(patch_size: int, patch_level: int, features_level: int, st
     return detector
 
 
-@register_tissue_detector("clam_segmentation_otsu")
-def clam_segmentation_otsu(patch_size: int, patch_level: int, features_level: int, close: int = 0) -> ThumbTissueDetector:
-    detector = ThumbTissueDetector(
+@register_detector("clam_segmentation_otsu")
+def clam_segmentation_otsu(patch_size: int, patch_level: int, features_level: int, close: int = 0) -> ThumbDetector:
+    detector = ThumbDetector(
         patch_size,
         patch_level,
         features_level,
@@ -52,9 +52,9 @@ def clam_segmentation_otsu(patch_size: int, patch_level: int, features_level: in
     return detector
 
 
-@register_tissue_detector("otsu_hs_segmentation")
-def otsu_hs_segmentation(patch_size: int, patch_level: int, features_level: int) -> ThumbTissueDetector:
-    detector = ThumbTissueDetector(
+@register_detector("otsu_hs_segmentation")
+def otsu_hs_segmentation(patch_size: int, patch_level: int, features_level: int) -> ThumbDetector:
+    detector = ThumbDetector(
         patch_size,
         patch_level,
         features_level,
@@ -68,9 +68,9 @@ def otsu_hs_segmentation(patch_size: int, patch_level: int, features_level: int)
     return detector
 
 
-@register_tissue_detector("per_patch_canny_segmentation")
-def per_patch_canny_segmentation(patch_size: int, patch_level: int) -> PatchesTissueDetector:
-    detector = PatchesTissueDetector(
+@register_detector("per_patch_canny_segmentation")
+def per_patch_canny_segmentation(patch_size: int, patch_level: int) -> PatchesDetector:
+    detector = PatchesDetector(
         patch_size,
         patch_level,
         TissueTransforms(
@@ -81,9 +81,9 @@ def per_patch_canny_segmentation(patch_size: int, patch_level: int) -> PatchesTi
     return detector
 
 
-@register_tissue_detector("per_patch_canny_ranker")
-def per_patch_canny_ranker(patch_size: int, patch_level: int) -> PatchesTissueDetector:
-    detector = PatchesTissueDetector(
+@register_detector("per_patch_canny_ranker")
+def per_patch_canny_ranker(patch_size: int, patch_level: int) -> PatchesDetector:
+    detector = PatchesDetector(
         patch_size,
         patch_level,
         TissueTransforms(

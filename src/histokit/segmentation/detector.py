@@ -1,7 +1,7 @@
-# a tissue detector goes from a slide to an array of labels for pixels of the slide at some level
+# a detector goes from a slide to an array of labels for pixels of the slide at some level
 # this might be a slide -> array or slide -> thumbnail -> array
 # TissueTransforms go from arrays (thumbnails) to arrays
-# TissueDetectors go from slides to arrays
+# Detectors go from slides to arrays
 
 from abc import ABCMeta, abstractmethod
 
@@ -18,9 +18,9 @@ from .transforms import (
 from histokit.io.slides import SlideBase, Region
 
 
-class TissueDetector(metaclass=ABCMeta):
+class Detector(metaclass=ABCMeta):
     def __init__(self) -> None:
-        self._name: str = "Unnamed Tissue Detector"
+        self._name: str = "Unnamed Detector"
 
     @abstractmethod
     def __call__(self, slide: SlideBase) -> np.ndarray:
@@ -35,7 +35,7 @@ class TissueDetector(metaclass=ABCMeta):
         self._name = name
 
 
-class ThumbTissueDetector(TissueDetector):
+class ThumbDetector(Detector):
     def __init__(self,
                  patch_size: int, 
                  patch_level: int,
@@ -71,7 +71,7 @@ class ThumbTissueDetector(TissueDetector):
         return tissue_mask
 
 
-class PatchesTissueDetector(TissueDetector):
+class PatchesDetector(Detector):
     def __init__(
         self,
         patch_size: int,

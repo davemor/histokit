@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 from histokit.dataset.schema import AnnotationSchema, SlideSchema
 from histokit.io.slides.registry import get_slide_cls, get_slide_cls_for_path, is_slide_extension_supported, is_slide_format_supported
+from histokit.io.slides.slide import SlideBase
 
 
 if TYPE_CHECKING:
@@ -22,7 +23,7 @@ class Sample:
     annotation_schema: AnnotationSchema | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
-    def make_slide(self):
+    def make_slide(self) -> SlideBase:
         if is_slide_format_supported(self.slide_schema.kind):
             slide_cls = get_slide_cls(self.slide_schema.kind)
         elif is_slide_extension_supported(self.slide_path.suffix):
